@@ -1,86 +1,65 @@
-﻿namespace TransactionService.Domain.Entities;
+﻿using TransactionService.Domain.Events;
+
+namespace TransactionService.Domain.Entities;
 
 public class Transaction : AggregateRoot<TransactionId>
 {
-    public WalletId FromWalletId { get; private set; }
-    public WalletId ToWalletId { get; private set; }
-    public Amount Amount { get; private set; }
-    
+    public WalletId          FromWalletId      { get; private set; }
+    public WalletId          ToWalletId        { get; private set; }
+    public Amount            Amount            { get; private set; }
     public TransactionStatus TransactionStatus { get; private set; }
-    
-    public SourceType SourceType { get; private set; }
+    public SourceType        SourceType        { get; private set; }
 
-    private Transaction()
+    /// <summary>Motivo del fallo, poblado cuando Status = FAILED.</summary>
+    public string? FailureReason { get; private set; }
+
+    private Transaction() { }
+
+    // ── Factory ───────────────────────────────────────────────────────────────
+    /// <summary>
+    /// Crea una transacción en estado PENDING y levanta el evento de dominio
+    /// TransactionCreatedDomainEvent. No valida saldo ni límites.
+    /// </summary>
+    public static Transaction Create(
+        Guid         fromWalletId,
+        Guid         toWalletId,
+        decimal      amount,
+        CurrencyType currency,
+        SourceType   sourceType)
     {
-    }
+        var errors = ValidateFieldsRequired(fromWalletId, toWalletId, amount, currency, sourceType);
 
-    public static Transaction Create(Guid fromWalletId, Guid toWalletId, decimal amount, CurrencyType currency, SourceType sourceType, decimal exchangeRate)
-    {
-        var errors = ValidateFieldsRequired(fromWalletId, toWalletId, amount, currency, sourceType, exchangeRate);
-
-        if (errors.Any())
+        if (errors.Count != 0)
             throw new DomainValidationException("transaction.invalid", "Validation failed", errors);
 
-        var transaction = new Transaction();
-
-        try
+        var transaction = new Transaction
         {
-            transaction = new Transaction
-            {
-                Id = TransactionId.NewId(),
-                FromWalletId = new WalletId(fromWalletId),
-                ToWalletId = new WalletId(toWalletId),
-                Amount = Amount.Create(amount, currency, exchangeRate),
-                TransactionStatus = TransactionStatus.COMPLETED,
-                SourceType = sourceType
-            };
-        }
-        catch (InvalidValueObjectException iv)
-        {
-            // Mapear errores de ValueObjects a las claves esperadas por Transaction
-            var errorsVo = new Dictionary<string, string[]>();
+            Id                = TransactionId.NewId(),
+            FromWalletId      = new WalletId(fromWalletId),
+            ToWalletId        = new WalletId(toWalletId),
+            Amount            = Amount.Create(amount, currency, exchangeRate: 1m),
+            TransactionStatus = TransactionStatus.PENDING,
+            SourceType        = sourceType
+        };
 
-            foreach (var kv in iv.Errors)
-            {
-                var key = kv.Key ?? string.Empty;
+        transaction.AddDomainEvent(new TransactionCreatedDomainEvent(
+            transactionId: transaction.Id.Value,
+            fromWalletId:  fromWalletId,
+            toWalletId:    toWalletId,
+            amount:        amount,
+            currency:      currency.ToString(),
+            sourceType:    sourceType.ToString()
+        ));
 
-                var targetKey = key switch
-                {
-                    "fromWalletId"  => "fromWalletId",
-                    "toWalletId"  => "toWalletId",
-                    "walletId"  => "walletId",
-                    "amount" or "value" or "money" => "amount",
-                    "currency" => "currency",
-                    "sourceType" => "sourceType",
-                    "exchangeRate" => "exchangeRate",
-                    _ => key
-                };
-
-                errorsVo[targetKey] = kv.Value;
-            }
-
-            // Fusionar errores obtenidos desde los VOs con los errores existentes
-            foreach (var kv in errorsVo)
-            {
-                if (errors.ContainsKey(kv.Key))
-                {
-                    var merged = errors[kv.Key].Concat(kv.Value).Distinct().ToArray();
-                    errors[kv.Key] = merged;
-                }
-                else
-                {
-                    errors[kv.Key] = kv.Value;
-                }
-            }
-        }
-
-        return errors.Count != 0
-            ? throw new DomainValidationException("transaction.invalid", "Validation failed", errors)
-            : transaction;
+        return transaction;
     }
 
-    public static Dictionary<string, string[]> ValidateFieldsRequired(Guid fromWalletId, Guid toWalletId,
-        decimal amount, CurrencyType currency, SourceType sourceType, decimal exchangeRate)
+    public static Dictionary<string, string[]> ValidateFieldsRequired(
+        Guid         fromWalletId,
+        Guid         toWalletId,
+        decimal      amount,
+        CurrencyType currency,
+        SourceType   sourceType)
     {
         var errors = new Dictionary<string, string[]>();
 
@@ -89,68 +68,50 @@ public class Transaction : AggregateRoot<TransactionId>
 
         if (toWalletId == Guid.Empty)
             errors["toWalletId"] = ["El identificador de la billetera destino es requerido."];
-        
+
         if (fromWalletId == toWalletId)
             errors["walletId"] = ["El identificador de la billetera origen y destino no deben ser iguales."];
 
         if (amount <= 0m)
             errors["amount"] = ["El monto debe ser mayor a cero."];
 
-        if (exchangeRate <= 0m)
-            errors["exchangeRate"] = ["El ratio de cambio debe ser mayor a cero."];
-
         if (!Enum.IsDefined(typeof(CurrencyType), currency) || currency.Equals(default(CurrencyType)))
             errors["currency"] = ["El tipo de moneda es requerido y debe ser válido."];
-        
+
         if (!Enum.IsDefined(typeof(SourceType), sourceType) || sourceType.Equals(default(SourceType)))
             errors["sourceType"] = ["El origen es requerido y debe ser válido."];
 
         return errors;
     }
-    
-    public decimal TotalCalculated(CurrencyType currency)
+
+    // ── Saga state transitions ────────────────────────────────────────────────
+    /// <summary>Actualiza el estado a COMPLETED. Idempotente.</summary>
+    public void Complete()
     {
-        return Amount.Currency == currency ? Amount.Value : Amount.ApplyExchange();
+        if (TransactionStatus == TransactionStatus.COMPLETED) return;
+
+        if (TransactionStatus != TransactionStatus.PENDING)
+            throw new InvalidDomainStateException(
+                "transaction.invalid_state",
+                $"No se puede completar una transacción en estado {TransactionStatus}.");
+
+        TransactionStatus = TransactionStatus.COMPLETED;
     }
 
-    public List<Operation> ToOperation(CurrencyType currency)
+    /// <summary>Actualiza el estado a FAILED y guarda el motivo. Idempotente.</summary>
+    public void Fail(string reason)
     {
-        return
-        [
-            new Operation()
-            {
-                WalletId = FromWalletId,
-                Amount = TotalCalculated(currency),
-                Currency = currency,
-                Type = (TransactionStatus == TransactionStatus.COMPLETED ? TypeOperation.Subtract : TypeOperation.Addition)
-            },
+        if (TransactionStatus == TransactionStatus.FAILED) return;
 
-            new Operation()
-            {
-                WalletId = ToWalletId,
-                Amount = TotalCalculated(currency),
-                Currency = currency,
-                Type = (TransactionStatus == TransactionStatus.COMPLETED ? TypeOperation.Addition : TypeOperation.Subtract)
-            }
-        ];
+        if (TransactionStatus != TransactionStatus.PENDING)
+            throw new InvalidDomainStateException(
+                "transaction.invalid_state",
+                $"No se puede fallar una transacción en estado {TransactionStatus}.");
+
+        TransactionStatus = TransactionStatus.FAILED;
+        FailureReason     = reason;
     }
 
-    public void ValidateIfTransactionHaveLimit(decimal limit, decimal amountTransactions, CurrencyType currency)
-    {
-        if (amountTransactions + TotalCalculated(currency) > limit)
-            throw new BusinessRuleViolationException(
-                "transaction.limit_exceeded",
-                "El monto de transferencia excede el límite diario permitido para la wallet.");
-    }
-    
-    public void TotalCalculatedToWalletFrom(decimal amount, CurrencyType currency)
-    {
-        if (amount < TotalCalculated(currency))
-            throw new BusinessRuleViolationException(
-                "transaction.insufficient_balance",
-                "El monto de transferencia no puede ser mayor al balance actual de la wallet.");
-    }
-    
     public void SoftDelete()
     {
         SetDeleted();
