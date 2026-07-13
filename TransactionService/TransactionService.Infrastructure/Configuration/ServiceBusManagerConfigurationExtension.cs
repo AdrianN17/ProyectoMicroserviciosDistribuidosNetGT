@@ -22,7 +22,7 @@ public static class ServiceBusManagerConfigurationExtension
 
         services.AddMassTransit(busConfig =>
         {
-            // ── Consumers (eventos entrantes de WalletService) ────────────────
+            // ── Consumers (mensajes entrantes de WalletService) ───────────────
             busConfig.AddConsumer<TransactionCompletedConsumer>();
             busConfig.AddConsumer<TransactionFailedConsumer>();
 
@@ -39,23 +39,32 @@ public static class ServiceBusManagerConfigurationExtension
 
                 cfg.Host(connectionString);
 
-                // ── Topic: transaction-completed → TransactionCompletedConsumer ──
-                cfg.SubscriptionEndpoint(
-                    serviceBusOptions.SubscriptionName,
-                    serviceBusOptions.TransactionCompletedTopic,
-                    e => e.ConfigureConsumer<TransactionCompletedConsumer>(context));
+                // ── Cola: transaction-completed → TransactionCompletedConsumer ──
+                // Azure Service Bus Basic tier: solo colas, sin topics/subscriptions
+                cfg.ReceiveEndpoint(serviceBusOptions.TransactionCompletedQueueName,
+                    (IServiceBusReceiveEndpointConfigurator e) =>
+                    {
+                        e.ConfigureConsumeTopology = false;
+                        e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                        e.DiscardSkippedMessages();
+                        e.DiscardFaultedMessages();
+                        e.ConfigureConsumer<TransactionCompletedConsumer>(context);
+                    });
 
-                // ── Topic: transaction-failed → TransactionFailedConsumer ────────
-                cfg.SubscriptionEndpoint(
-                    serviceBusOptions.SubscriptionName,
-                    serviceBusOptions.TransactionFailedTopic,
-                    e => e.ConfigureConsumer<TransactionFailedConsumer>(context));
-
-                cfg.ConfigureEndpoints(context);
+                // ── Cola: transaction-failed → TransactionFailedConsumer ─────────
+                cfg.ReceiveEndpoint(serviceBusOptions.TransactionFailedQueueName,
+                    (IServiceBusReceiveEndpointConfigurator e) =>
+                    {
+                        e.ConfigureConsumeTopology = false;
+                        e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                        e.DiscardSkippedMessages();
+                        e.DiscardFaultedMessages();
+                        e.ConfigureConsumer<TransactionFailedConsumer>(context);
+                    });
             });
         });
 
-        // IEventBus: publica TransactionCreated hacia Azure Service Bus (topic)
+        // IEventBus: envía TransactionCreated a la cola de WalletService
         services.AddScoped<IEventBus, EventBus>();
 
         // IProducer: mantiene la funcionalidad de envío a colas para otros flujos

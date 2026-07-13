@@ -64,8 +64,10 @@ namespace WalletService.Infrastructure.Persistence.Contexts
 
         private async Task DistpatchDomainEventsAsync(CancellationToken cancellationToken)
         {
+            // Wallet : AggregateRoot<WalletId> es el único agregado raíz en WalletService.
+            // Usando el tipo correcto para que ChangeTracker pueda encontrar las entidades.
             var domainEntities = ChangeTracker
-                .Entries<AggregateRoot<string>>()
+                .Entries<AggregateRoot<WalletId>>()
                 .Where(e => e.Entity.DomainEvents != null && e.Entity.DomainEvents.Any())
                 .ToList();
 

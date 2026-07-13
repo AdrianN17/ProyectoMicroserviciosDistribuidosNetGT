@@ -4,17 +4,14 @@ public sealed class ServiceBusOptions
 {
     public const string SectionName = "ServiceBus";
 
-    /// <summary>Topic al que TransactionService publica TransactionCreated.</summary>
-    public string TransactionCreatedTopic { get; set; } = "transaction-created";
+    /// <summary>Cola donde TransactionService envía TransactionCreated (WalletService consume).</summary>
+    public string TransactionCreatedQueueName { get; set; } = "transaction-created";
 
-    /// <summary>Topic desde el que TransactionService consume TransactionCompleted.</summary>
-    public string TransactionCompletedTopic { get; set; } = "transaction-completed";
+    /// <summary>Cola donde WalletService publica TransactionCompleted (TransactionService consume).</summary>
+    public string TransactionCompletedQueueName { get; set; } = "transaction-completed";
 
-    /// <summary>Topic desde el que TransactionService consume TransactionFailed.</summary>
-    public string TransactionFailedTopic { get; set; } = "transaction-failed";
-
-    /// <summary>Nombre de la suscripción de este servicio en los topics de entrada.</summary>
-    public string SubscriptionName { get; set; } = "transaction-service";
+    /// <summary>Cola donde WalletService publica TransactionFailed (TransactionService consume).</summary>
+    public string TransactionFailedQueueName { get; set; } = "transaction-failed";
 
     // Mantenemos QueueName por compatibilidad con recargas y otros flujos.
     public string QueueName { get; set; } = string.Empty;

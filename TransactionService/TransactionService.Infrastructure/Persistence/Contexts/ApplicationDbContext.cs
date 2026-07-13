@@ -47,16 +47,20 @@ namespace TransactionService.Infrastructure.Persistence.Contexts
 
         private async Task DispatchDomainEventsAsync(CancellationToken cancellationToken)
         {
-            var domainEntities = ChangeTracker
-                .Entries<AggregateRoot<object>>()
-                .Where(e => e.Entity.DomainEvents.Any())
+            // Usamos IHasDomainEvents (interfaz no genérica) para encontrar cualquier
+            // AggregateRoot<TId>, independientemente del tipo del identificador.
+            var aggregates = ChangeTracker
+                .Entries()
+                .Select(e => e.Entity)
+                .OfType<IHasDomainEvents>()
+                .Where(e => e.DomainEvents.Any())
                 .ToList();
 
-            var domainEvents = domainEntities
-                .SelectMany(e => e.Entity.DomainEvents)
+            var domainEvents = aggregates
+                .SelectMany(e => e.DomainEvents)
                 .ToList();
 
-            domainEntities.ForEach(e => e.Entity.ClearDomainEvents());
+            aggregates.ForEach(e => e.ClearDomainEvents());
 
             foreach (var domainEvent in domainEvents)
                 await _publisher.Publish(domainEvent, cancellationToken);

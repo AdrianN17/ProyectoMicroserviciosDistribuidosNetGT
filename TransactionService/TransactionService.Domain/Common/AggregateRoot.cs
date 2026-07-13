@@ -1,6 +1,6 @@
 ﻿namespace TransactionService.Domain.Common
 {
-    public abstract class AggregateRoot<TId> : AuditableEntity<TId>
+    public abstract class AggregateRoot<TId> : AuditableEntity<TId>, IHasDomainEvents
     {
         private readonly List<DomainEvent> _domainEvents = new();
 

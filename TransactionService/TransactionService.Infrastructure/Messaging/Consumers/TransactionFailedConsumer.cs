@@ -2,21 +2,23 @@ using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using TransactionService.Application.Transactions.Commands.FailTransaction;
-using TransactionService.Application.Transactions.IntegrationEvents;
+using TransactionService.Infrastructure.Messaging;
 
 namespace TransactionService.Infrastructure.Messaging.Consumers;
 
 /// <summary>
-/// Consumer de Azure Service Bus que escucha el evento TransactionFailed
+/// Consumer de Azure Service Bus que escucha el mensaje TransactionFailed
 /// publicado por WalletService y delega la actualización a la capa Application
 /// mediante MediatR (FailTransactionCommand).
+/// El tipo TransactionFailedMessage lleva el [MessageUrn] que coincide con el
+/// publicado por WalletService.
 /// </summary>
 public sealed class TransactionFailedConsumer(
     IMediator mediator,
     ILogger<TransactionFailedConsumer> logger)
-    : IConsumer<TransactionFailedIntegrationEvent>
+    : IConsumer<TransactionFailedMessage>
 {
-    public async Task Consume(ConsumeContext<TransactionFailedIntegrationEvent> context)
+    public async Task Consume(ConsumeContext<TransactionFailedMessage> context)
     {
         var message = context.Message;
 

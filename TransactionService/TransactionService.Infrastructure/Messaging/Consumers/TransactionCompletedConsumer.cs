@@ -2,21 +2,23 @@ using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using TransactionService.Application.Transactions.Commands.CompleteTransaction;
-using TransactionService.Application.Transactions.IntegrationEvents;
+using TransactionService.Infrastructure.Messaging;
 
 namespace TransactionService.Infrastructure.Messaging.Consumers;
 
 /// <summary>
-/// Consumer de Azure Service Bus que escucha el evento TransactionCompleted
+/// Consumer de Azure Service Bus que escucha el mensaje TransactionCompleted
 /// publicado por WalletService y delega la actualización a la capa Application
 /// mediante MediatR (CompleteTransactionCommand).
+/// El tipo TransactionCompletedMessage lleva el [MessageUrn] que coincide con el
+/// publicado por WalletService.
 /// </summary>
 public sealed class TransactionCompletedConsumer(
     IMediator mediator,
     ILogger<TransactionCompletedConsumer> logger)
-    : IConsumer<TransactionCompletedIntegrationEvent>
+    : IConsumer<TransactionCompletedMessage>
 {
-    public async Task Consume(ConsumeContext<TransactionCompletedIntegrationEvent> context)
+    public async Task Consume(ConsumeContext<TransactionCompletedMessage> context)
     {
         var message = context.Message;
 
