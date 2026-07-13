@@ -49,7 +49,19 @@ public static class ServiceBusManagerConfigurationExtension
                         e.ConfigureConsumeTopology = false;
                         e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                         e.DiscardSkippedMessages();
-                        e.DiscardFaultedMessages();
+                        // Reintento: 3 intentos con backoff incremental antes de dead-letter
+                        e.UseMessageRetry(r => r.Intervals(
+                            TimeSpan.FromSeconds(1),
+                            TimeSpan.FromSeconds(5),
+                            TimeSpan.FromSeconds(15)));
+                        // Circuit breaker: corta el circuito si más del 15% de mensajes fallan
+                        e.UseCircuitBreaker(cb =>
+                        {
+                            cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                            cb.TripThreshold   = 15;
+                            cb.ActiveThreshold = 10;
+                            cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                        });
                         e.ConfigureConsumer<TransactionCompletedConsumer>(context);
                     });
 
@@ -60,7 +72,17 @@ public static class ServiceBusManagerConfigurationExtension
                         e.ConfigureConsumeTopology = false;
                         e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                         e.DiscardSkippedMessages();
-                        e.DiscardFaultedMessages();
+                        e.UseMessageRetry(r => r.Intervals(
+                            TimeSpan.FromSeconds(1),
+                            TimeSpan.FromSeconds(5),
+                            TimeSpan.FromSeconds(15)));
+                        e.UseCircuitBreaker(cb =>
+                        {
+                            cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                            cb.TripThreshold   = 15;
+                            cb.ActiveThreshold = 10;
+                            cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                        });
                         e.ConfigureConsumer<TransactionFailedConsumer>(context);
                     });
 
@@ -71,7 +93,17 @@ public static class ServiceBusManagerConfigurationExtension
                         e.ConfigureConsumeTopology = false;
                         e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                         e.DiscardSkippedMessages();
-                        e.DiscardFaultedMessages();
+                        e.UseMessageRetry(r => r.Intervals(
+                            TimeSpan.FromSeconds(1),
+                            TimeSpan.FromSeconds(5),
+                            TimeSpan.FromSeconds(15)));
+                        e.UseCircuitBreaker(cb =>
+                        {
+                            cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                            cb.TripThreshold   = 15;
+                            cb.ActiveThreshold = 10;
+                            cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                        });
                         e.ConfigureConsumer<RechargeCompletedConsumer>(context);
                     });
 
@@ -82,7 +114,17 @@ public static class ServiceBusManagerConfigurationExtension
                         e.ConfigureConsumeTopology = false;
                         e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                         e.DiscardSkippedMessages();
-                        e.DiscardFaultedMessages();
+                        e.UseMessageRetry(r => r.Intervals(
+                            TimeSpan.FromSeconds(1),
+                            TimeSpan.FromSeconds(5),
+                            TimeSpan.FromSeconds(15)));
+                        e.UseCircuitBreaker(cb =>
+                        {
+                            cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                            cb.TripThreshold   = 15;
+                            cb.ActiveThreshold = 10;
+                            cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                        });
                         e.ConfigureConsumer<RechargeFailedConsumer>(context);
                     });
             });

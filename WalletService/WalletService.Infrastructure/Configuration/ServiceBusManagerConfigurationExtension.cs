@@ -47,7 +47,17 @@ public static class ServiceBusManagerConfigurationExtension
                     e.ConfigureConsumeTopology = false;
                     e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                     e.DiscardSkippedMessages();
-                    e.DiscardFaultedMessages();
+                    e.UseMessageRetry(r => r.Intervals(
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(15)));
+                    e.UseCircuitBreaker(cb =>
+                    {
+                        cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                        cb.TripThreshold   = 15;
+                        cb.ActiveThreshold = 10;
+                        cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                    });
                     e.ConfigureConsumer<UpdateBalanceConsumer>(context);
                 });
 
@@ -57,7 +67,17 @@ public static class ServiceBusManagerConfigurationExtension
                     e.ConfigureConsumeTopology = false;
                     e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                     e.DiscardSkippedMessages();
-                    e.DiscardFaultedMessages();
+                    e.UseMessageRetry(r => r.Intervals(
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(15)));
+                    e.UseCircuitBreaker(cb =>
+                    {
+                        cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                        cb.TripThreshold   = 15;
+                        cb.ActiveThreshold = 10;
+                        cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                    });
                     e.ConfigureConsumer<TransactionCreatedConsumer>(context);
                 });
 
@@ -67,7 +87,17 @@ public static class ServiceBusManagerConfigurationExtension
                     e.ConfigureConsumeTopology = false;
                     e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                     e.DiscardSkippedMessages();
-                    e.DiscardFaultedMessages();
+                    e.UseMessageRetry(r => r.Intervals(
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(15)));
+                    e.UseCircuitBreaker(cb =>
+                    {
+                        cb.TrackingPeriod  = TimeSpan.FromMinutes(1);
+                        cb.TripThreshold   = 15;
+                        cb.ActiveThreshold = 10;
+                        cb.ResetInterval   = TimeSpan.FromMinutes(5);
+                    });
                     e.ConfigureConsumer<RechargeCreatedConsumer>(context);
                 });
             });
