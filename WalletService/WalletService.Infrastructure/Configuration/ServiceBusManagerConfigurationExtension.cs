@@ -24,8 +24,11 @@ public static class ServiceBusManagerConfigurationExtension
             // Consumer existente (SendOperation/UpdateBalance)
             busConfig.AddConsumer<UpdateBalanceConsumer>();
 
-            // Consumer nuevo para la Saga TransactionCreated
+            // Consumers para la Saga TransactionCreated
             busConfig.AddConsumer<TransactionCreatedConsumer>();
+
+            // Consumer para la Saga RechargeCreated
+            busConfig.AddConsumer<RechargeCreatedConsumer>();
 
             busConfig.UsingAzureServiceBus((context, cfg) =>
             {
@@ -48,15 +51,24 @@ public static class ServiceBusManagerConfigurationExtension
                     e.ConfigureConsumer<UpdateBalanceConsumer>(context);
                 });
 
-                // ── Cola nueva: TransactionCreated (Saga Coreografiada) ────────────
+                // ── Cola: TransactionCreated (Saga Coreografiada) ─────────────────
                 cfg.ReceiveEndpoint(serviceBusOptions.TransactionCreatedQueueName, (IServiceBusReceiveEndpointConfigurator e) =>
                 {
-                    // Azure Service Bus Basic tier: solo colas, sin topics/subscriptions
                     e.ConfigureConsumeTopology = false;
                     e.AutoDeleteOnIdle = TimeSpan.MaxValue;
                     e.DiscardSkippedMessages();
                     e.DiscardFaultedMessages();
                     e.ConfigureConsumer<TransactionCreatedConsumer>(context);
+                });
+
+                // ── Cola: RechargeCreated (Saga Coreografiada Recharge) ────────────
+                cfg.ReceiveEndpoint(serviceBusOptions.RechargeCreatedQueueName, (IServiceBusReceiveEndpointConfigurator e) =>
+                {
+                    e.ConfigureConsumeTopology = false;
+                    e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                    e.DiscardSkippedMessages();
+                    e.DiscardFaultedMessages();
+                    e.ConfigureConsumer<RechargeCreatedConsumer>(context);
                 });
             });
         });

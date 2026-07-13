@@ -16,7 +16,6 @@ namespace TransactionService.Infrastructure.Persistence.Repositories
         public async Task CreateAsync(Recharge recharge)
         {
             await _context.Recharges.AddAsync(recharge);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<Recharge?> GetByIdAsync(RechargeId id, CancellationToken cancellationToken = default)
@@ -36,7 +35,6 @@ namespace TransactionService.Infrastructure.Persistence.Repositories
         public async Task UpdateAsync(Recharge recharge, CancellationToken cancellationToken = default)
         {
             _context.Recharges.Update(recharge);
-            await _context.SaveChangesAsync(cancellationToken);
         }
         
         

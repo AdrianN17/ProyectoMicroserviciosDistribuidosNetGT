@@ -116,6 +116,11 @@ public class Transaction : AggregateRoot<TransactionId>
 
     public void SoftDelete()
     {
+        if (TransactionStatus != TransactionStatus.PENDING)
+            throw new InvalidDomainStateException(
+                "transaction.invalid_state",
+                $"Solo se puede cancelar una transacción en estado PENDING. Estado actual: {TransactionStatus}.");
+
         SetDeleted();
         TransactionStatus = TransactionStatus.CANCELLED;
     }

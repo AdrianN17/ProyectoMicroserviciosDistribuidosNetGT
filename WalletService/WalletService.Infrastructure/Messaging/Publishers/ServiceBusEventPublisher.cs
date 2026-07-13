@@ -71,5 +71,42 @@ public sealed class ServiceBusEventPublisher : IEventPublisher
             "Publicado TransactionFailed. TransactionId: {TransactionId}, Razón: {Reason}, Cola: {Queue}",
             @event.TransactionId, @event.Reason, _options.TransactionFailedQueueName);
     }
+
+    public async Task PublishRechargeCompletedAsync(
+        RechargeCompletedEvent @event,
+        CancellationToken cancellationToken = default)
+    {
+        var message = new RechargeCompletedMessage(
+            RechargeId: @event.RechargeId
+        );
+
+        var endpoint = await _sendEndpointProvider.GetSendEndpoint(
+            new Uri($"queue:{_options.RechargeCompletedQueueName}"));
+
+        await endpoint.Send(message, cancellationToken);
+
+        _logger.LogInformation(
+            "Publicado RechargeCompleted. RechargeId: {RechargeId}, Cola: {Queue}",
+            @event.RechargeId, _options.RechargeCompletedQueueName);
+    }
+
+    public async Task PublishRechargeFailedAsync(
+        RechargeFailedEvent @event,
+        CancellationToken cancellationToken = default)
+    {
+        var message = new RechargeFailedMessage(
+            RechargeId: @event.RechargeId,
+            Reason:     @event.Reason
+        );
+
+        var endpoint = await _sendEndpointProvider.GetSendEndpoint(
+            new Uri($"queue:{_options.RechargeFailedQueueName}"));
+
+        await endpoint.Send(message, cancellationToken);
+
+        _logger.LogWarning(
+            "Publicado RechargeFailed. RechargeId: {RechargeId}, Razón: {Reason}, Cola: {Queue}",
+            @event.RechargeId, @event.Reason, _options.RechargeFailedQueueName);
+    }
 }
 

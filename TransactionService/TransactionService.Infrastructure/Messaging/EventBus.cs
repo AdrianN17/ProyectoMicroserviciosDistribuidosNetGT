@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using TransactionService.Application.Abstractions.Messaging;
+using TransactionService.Application.Recharge.IntegrationEvents;
 using TransactionService.Application.Transactions.IntegrationEvents;
 using TransactionService.Infrastructure.Configuration;
 
@@ -27,9 +28,8 @@ public sealed class EventBus(
 
         if (message is not TransactionCreatedIntegrationEvent integrationEvent)
             throw new NotSupportedException(
-                $"EventBus solo soporta TransactionCreatedIntegrationEvent. Tipo recibido: {typeof(T).Name}");
+                $"EventBus.PublishAsync solo soporta TransactionCreatedIntegrationEvent. Tipo recibido: {typeof(T).Name}");
 
-        // Convertimos al contrato de Infrastructure que lleva el [MessageUrn] correcto
         var contract = new TransactionCreatedMessage(
             TransactionId: integrationEvent.TransactionId,
             FromWalletId:  integrationEvent.FromWalletId,
@@ -46,6 +46,32 @@ public sealed class EventBus(
         logger.LogInformation(
             "Evento {EventType} publicado exitosamente en cola {Queue}.",
             typeof(T).Name, serviceBusOptions.TransactionCreatedQueueName);
+    }
+
+    public async Task PublishRechargeCreatedAsync(
+        RechargeCreatedIntegrationEvent @event,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation(
+            "Publicando RechargeCreated para RechargeId {RechargeId} en cola {Queue}",
+            @event.RechargeId, serviceBusOptions.RechargeCreatedQueueName);
+
+        var contract = new RechargeCreatedMessage(
+            RechargeId:   @event.RechargeId,
+            WalletId:     @event.WalletId,
+            Amount:       @event.Amount,
+            Currency:     @event.Currency,
+            MethodType:   @event.MethodType,
+            ExchangeRate: @event.ExchangeRate);
+
+        var endpoint = await sendEndpointProvider.GetSendEndpoint(
+            new Uri($"queue:{serviceBusOptions.RechargeCreatedQueueName}"));
+
+        await endpoint.Send(contract, cancellationToken);
+
+        logger.LogInformation(
+            "RechargeCreated publicado exitosamente en cola {Queue}.",
+            serviceBusOptions.RechargeCreatedQueueName);
     }
 }
 

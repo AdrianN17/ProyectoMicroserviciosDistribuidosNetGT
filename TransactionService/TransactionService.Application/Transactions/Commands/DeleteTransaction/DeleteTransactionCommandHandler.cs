@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using TransactionService.Application.Commmon.Interfaces;
+using TransactionService.Domain.Common;
 
 namespace TransactionService.Application.Transactions.Commands.DeleteTransaction;
 
@@ -37,7 +38,14 @@ public sealed class DeleteTransactionCommandHandler
                 code:        "Transaction.NotFound",
                 description: $"La transacción {request.TransactionId} no fue encontrada.");
 
-        transaction.SoftDelete();
+        try
+        {
+            transaction.SoftDelete();
+        }
+        catch (DomainException ex)
+        {
+            return Error.Conflict(code: ex.Code, description: ex.Message);
+        }
 
         await _transactionRepository.UpdateAsync(transaction, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

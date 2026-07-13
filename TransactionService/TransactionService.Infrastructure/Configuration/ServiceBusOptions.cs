@@ -13,6 +13,15 @@ public sealed class ServiceBusOptions
     /// <summary>Cola donde WalletService publica TransactionFailed (TransactionService consume).</summary>
     public string TransactionFailedQueueName { get; set; } = "transaction-failed";
 
+    /// <summary>Cola donde TransactionService envía RechargeCreated (WalletService consume).</summary>
+    public string RechargeCreatedQueueName { get; set; } = "recharge-created";
+
+    /// <summary>Cola donde WalletService publica RechargeCompleted (TransactionService consume).</summary>
+    public string RechargeCompletedQueueName { get; set; } = "recharge-completed";
+
+    /// <summary>Cola donde WalletService publica RechargeFailed (TransactionService consume).</summary>
+    public string RechargeFailedQueueName { get; set; } = "recharge-failed";
+
     // Mantenemos QueueName por compatibilidad con recargas y otros flujos.
     public string QueueName { get; set; } = string.Empty;
 }

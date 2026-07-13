@@ -57,6 +57,7 @@ namespace WalletService.Infrastructure
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IProcessedTransactionRepository, ProcessedTransactionRepository>();
+            services.AddScoped<IProcessedRechargeRepository, ProcessedRechargeRepository>();
 
             return services;
         }

@@ -1,3 +1,5 @@
+using TransactionService.Application.Recharge.IntegrationEvents;
+
 namespace TransactionService.Application.Abstractions.Messaging;
 
 /// <summary>
@@ -7,5 +9,6 @@ namespace TransactionService.Application.Abstractions.Messaging;
 public interface IEventBus
 {
     Task PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : class;
+    Task PublishRechargeCreatedAsync(RechargeCreatedIntegrationEvent @event, CancellationToken cancellationToken = default);
 }
 

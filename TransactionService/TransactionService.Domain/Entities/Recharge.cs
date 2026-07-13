@@ -1,4 +1,6 @@
-﻿namespace TransactionService.Domain.Entities;
+﻿using TransactionService.Domain.Events;
+
+namespace TransactionService.Domain.Entities;
 
 public class Recharge : AggregateRoot<RechargeId>
 {
@@ -6,7 +8,10 @@ public class Recharge : AggregateRoot<RechargeId>
     public Amount Amount { get; private set; }
     public MethodType MethodType { get; private set; }
     public RechargeStatus RechargeStatus { get; private set; }
-    
+
+    /// <summary>Motivo del fallo, poblado cuando Status = FAILED.</summary>
+    public string? FailureReason { get; private set; }
+
     private Recharge()
     {
     }
@@ -29,8 +34,17 @@ public class Recharge : AggregateRoot<RechargeId>
                 WalletId = new WalletId(walletId),
                 Amount = Amount.Create(amount, currency, exchangeRate),
                 MethodType = methodType,
-                RechargeStatus = RechargeStatus.COMPLETED
+                RechargeStatus = RechargeStatus.PENDING
             };
+
+            recharge.AddDomainEvent(new RechargeCreatedDomainEvent(
+                rechargeId:  recharge.Id.Value,
+                walletId:    walletId,
+                amount:      amount,
+                currency:    currency.ToString(),
+                methodType:  methodType.ToString(),
+                exchangeRate: exchangeRate
+            ));
         }
         catch (InvalidValueObjectException iv)
         {
@@ -155,8 +169,41 @@ public class Recharge : AggregateRoot<RechargeId>
         };
     }
 
+    // ── Saga state transitions ────────────────────────────────────────────────
+    /// <summary>Actualiza el estado a COMPLETED. Idempotente.</summary>
+    public void Complete()
+    {
+        if (RechargeStatus == RechargeStatus.COMPLETED) return;
+
+        if (RechargeStatus != RechargeStatus.PENDING)
+            throw new InvalidDomainStateException(
+                "recharge.invalid_state",
+                $"No se puede completar una recarga en estado {RechargeStatus}.");
+
+        RechargeStatus = RechargeStatus.COMPLETED;
+    }
+
+    /// <summary>Actualiza el estado a FAILED y guarda el motivo. Idempotente.</summary>
+    public void Fail(string reason)
+    {
+        if (RechargeStatus == RechargeStatus.FAILED) return;
+
+        if (RechargeStatus != RechargeStatus.PENDING)
+            throw new InvalidDomainStateException(
+                "recharge.invalid_state",
+                $"No se puede fallar una recarga en estado {RechargeStatus}.");
+
+        RechargeStatus = RechargeStatus.FAILED;
+        FailureReason  = reason;
+    }
+
     public void SoftDelete()
     {
+        if (RechargeStatus != RechargeStatus.COMPLETED)
+            throw new InvalidDomainStateException(
+                "recharge.invalid_state",
+                $"Solo se puede cancelar una recarga en estado COMPLETED. Estado actual: {RechargeStatus}.");
+
         SetDeleted();
         RechargeStatus = RechargeStatus.CANCELLED;
     }

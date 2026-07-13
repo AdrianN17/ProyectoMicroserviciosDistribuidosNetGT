@@ -10,5 +10,7 @@ public interface IEventPublisher
 {
     Task PublishTransactionCompletedAsync(TransactionCompletedEvent @event, CancellationToken cancellationToken = default);
     Task PublishTransactionFailedAsync(TransactionFailedEvent @event, CancellationToken cancellationToken = default);
+    Task PublishRechargeCompletedAsync(RechargeCompletedEvent @event, CancellationToken cancellationToken = default);
+    Task PublishRechargeFailedAsync(RechargeFailedEvent @event, CancellationToken cancellationToken = default);
 }
 

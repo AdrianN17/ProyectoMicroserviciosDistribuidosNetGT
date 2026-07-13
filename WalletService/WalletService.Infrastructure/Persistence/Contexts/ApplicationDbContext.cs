@@ -20,10 +20,16 @@ namespace WalletService.Infrastructure.Persistence.Contexts
         public DbSet<WalletLimit> WalletsLimit { get; set; }
 
         /// <summary>
-        /// Tabla de idempotencia para la Saga Coreografiada.
+        /// Tabla de idempotencia para la Saga Coreografiada de Transacciones.
         /// Almacena los TransactionId ya procesados para evitar procesar dos veces el mismo mensaje.
         /// </summary>
         public DbSet<ProcessedTransaction> ProcessedTransactions { get; set; }
+
+        /// <summary>
+        /// Tabla de idempotencia para la Saga Coreografiada de Recargas.
+        /// Almacena los RechargeId ya procesados para evitar procesar dos veces el mismo mensaje.
+        /// </summary>
+        public DbSet<ProcessedRecharge> ProcessedRecharges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

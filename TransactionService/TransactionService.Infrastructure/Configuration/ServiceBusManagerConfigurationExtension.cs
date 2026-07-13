@@ -25,6 +25,8 @@ public static class ServiceBusManagerConfigurationExtension
             // ── Consumers (mensajes entrantes de WalletService) ───────────────
             busConfig.AddConsumer<TransactionCompletedConsumer>();
             busConfig.AddConsumer<TransactionFailedConsumer>();
+            busConfig.AddConsumer<RechargeCompletedConsumer>();
+            busConfig.AddConsumer<RechargeFailedConsumer>();
 
             busConfig.UsingAzureServiceBus((context, cfg) =>
             {
@@ -60,6 +62,28 @@ public static class ServiceBusManagerConfigurationExtension
                         e.DiscardSkippedMessages();
                         e.DiscardFaultedMessages();
                         e.ConfigureConsumer<TransactionFailedConsumer>(context);
+                    });
+
+                // ── Cola: recharge-completed → RechargeCompletedConsumer ──────────
+                cfg.ReceiveEndpoint(serviceBusOptions.RechargeCompletedQueueName,
+                    (IServiceBusReceiveEndpointConfigurator e) =>
+                    {
+                        e.ConfigureConsumeTopology = false;
+                        e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                        e.DiscardSkippedMessages();
+                        e.DiscardFaultedMessages();
+                        e.ConfigureConsumer<RechargeCompletedConsumer>(context);
+                    });
+
+                // ── Cola: recharge-failed → RechargeFailedConsumer ────────────────
+                cfg.ReceiveEndpoint(serviceBusOptions.RechargeFailedQueueName,
+                    (IServiceBusReceiveEndpointConfigurator e) =>
+                    {
+                        e.ConfigureConsumeTopology = false;
+                        e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                        e.DiscardSkippedMessages();
+                        e.DiscardFaultedMessages();
+                        e.ConfigureConsumer<RechargeFailedConsumer>(context);
                     });
             });
         });
