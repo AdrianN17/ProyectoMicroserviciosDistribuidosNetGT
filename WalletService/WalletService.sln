@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletService.Api", "WalletService.API\WalletService.Api.csproj", "{B9417B50-27C7-4217-AC8F-CAB2250CECB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletService.Api", "WalletService.Api/WalletService.Api.csproj", "{B9417B50-27C7-4217-AC8F-CAB2250CECB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletService.Domain", "WalletService.Domain\WalletService.Domain.csproj", "{6D3B7E18-2721-411D-AA0A-F19F2B4F9D8A}"
 EndProject

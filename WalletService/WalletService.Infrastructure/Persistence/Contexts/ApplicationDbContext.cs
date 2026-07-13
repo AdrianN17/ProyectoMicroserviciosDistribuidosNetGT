@@ -1,7 +1,7 @@
-﻿
-using WalletService.Domain.Common;
+﻿using WalletService.Domain.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WalletService.Infrastructure.Persistence.Entities;
 
 namespace WalletService.Infrastructure.Persistence.Contexts
 {
@@ -19,6 +19,12 @@ namespace WalletService.Infrastructure.Persistence.Contexts
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<WalletLimit> WalletsLimit { get; set; }
 
+        /// <summary>
+        /// Tabla de idempotencia para la Saga Coreografiada.
+        /// Almacena los TransactionId ya procesados para evitar procesar dos veces el mismo mensaje.
+        /// </summary>
+        public DbSet<ProcessedTransaction> ProcessedTransactions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var assembly = typeof(ApplicationDbContext).Assembly;
@@ -29,9 +35,6 @@ namespace WalletService.Infrastructure.Persistence.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-
-            // Habilitar el logging de datos sensibles para desarrollo, pero no en producción
             optionsBuilder.EnableSensitiveDataLogging();
             base.OnConfiguring(optionsBuilder);
         }
@@ -77,6 +80,5 @@ namespace WalletService.Infrastructure.Persistence.Contexts
                 await _publisher.Publish(domainEvent, cancellationToken);
             }
         }
-
     }
 }

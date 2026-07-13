@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalletService.Application.Abstractions.Secrets;
 using WalletService.Infrastructure.Messaging;
+using WalletService.Infrastructure.Messaging.Consumers;
 
 namespace WalletService.Infrastructure.Configuration;
 
@@ -12,12 +13,19 @@ public static class ServiceBusManagerConfigurationExtension
     {
         var serviceBusOptions = configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>() ?? new ServiceBusOptions();
         if (string.IsNullOrEmpty(serviceBusOptions.QueueName)) throw new InvalidOperationException("ServiceBus QueueName is not configured.");
+        if (string.IsNullOrEmpty(serviceBusOptions.TransactionCreatedQueueName)) throw new InvalidOperationException("ServiceBus TransactionCreatedQueueName is not configured.");
+        if (string.IsNullOrEmpty(serviceBusOptions.TransactionCompletedQueueName)) throw new InvalidOperationException("ServiceBus TransactionCompletedQueueName is not configured.");
+        if (string.IsNullOrEmpty(serviceBusOptions.TransactionFailedQueueName)) throw new InvalidOperationException("ServiceBus TransactionFailedQueueName is not configured.");
 
         services.AddSingleton(serviceBusOptions);
 
         services.AddMassTransit(busConfig =>
         {
+            // Consumer existente (SendOperation/UpdateBalance)
             busConfig.AddConsumer<UpdateBalanceConsumer>();
+
+            // Consumer nuevo para la Saga TransactionCreated
+            busConfig.AddConsumer<TransactionCreatedConsumer>();
 
             busConfig.UsingAzureServiceBus((context, cfg) =>
             {
@@ -30,22 +38,25 @@ public static class ServiceBusManagerConfigurationExtension
 
                 cfg.Host(connectionString);
 
+                // ── Cola existente: UpdateBalance / SendOperation ──────────────────
                 cfg.ReceiveEndpoint(serviceBusOptions.QueueName, (IServiceBusReceiveEndpointConfigurator e) =>
                 {
-                    // Azure Service Bus Basic tier only supports Queues, not Topics/Subscriptions.
-                    // Disable topology configuration to prevent MassTransit from trying to create Topics.
                     e.ConfigureConsumeTopology = false;
-
-                    // Basic tier does not support AutoDeleteOnIdle on queues (including dead-letter queues).
-                    // Set to TimeSpan.MaxValue to effectively disable auto-delete.
                     e.AutoDeleteOnIdle = TimeSpan.MaxValue;
-
-                    // Basic tier does not support creating '_skipped' or '_error' queues with AutoDeleteOnIdle.
-                    // Discard skipped/faulted messages instead of forwarding them to auxiliary queues.
                     e.DiscardSkippedMessages();
                     e.DiscardFaultedMessages();
-
                     e.ConfigureConsumer<UpdateBalanceConsumer>(context);
+                });
+
+                // ── Cola nueva: TransactionCreated (Saga Coreografiada) ────────────
+                cfg.ReceiveEndpoint(serviceBusOptions.TransactionCreatedQueueName, (IServiceBusReceiveEndpointConfigurator e) =>
+                {
+                    // Azure Service Bus Basic tier: solo colas, sin topics/subscriptions
+                    e.ConfigureConsumeTopology = false;
+                    e.AutoDeleteOnIdle = TimeSpan.MaxValue;
+                    e.DiscardSkippedMessages();
+                    e.DiscardFaultedMessages();
+                    e.ConfigureConsumer<TransactionCreatedConsumer>(context);
                 });
             });
         });

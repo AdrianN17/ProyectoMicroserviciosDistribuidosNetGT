@@ -3,11 +3,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalletService.Application.Abstractions.Secrets;
 using WalletService.Application.Commmon.Interfaces;
+using WalletService.Application.Common.Interfaces;
 using WalletService.Domain.Interfaces;
 using WalletService.Infrastructure.Caching;
 using WalletService.Infrastructure.Configuration;
+using WalletService.Infrastructure.Messaging.Publishers;
 using WalletService.Infrastructure.Persistence.Contexts;
 using WalletService.Infrastructure.Persistence.Repositories;
+using WalletService.Infrastructure.Providers;
 
 namespace WalletService.Infrastructure
 {
@@ -26,9 +29,14 @@ namespace WalletService.Infrastructure
             {
                 throw new InvalidOperationException("Invalid SecretProviderType configuration. Valid values are 'SecretsManager' or 'Vault'.");
             }
+
             services.AddSingleton<InMemorySecretCache>();
             services.AddPersistence(configuration);
+            services.AddExchangeRate(configuration);
             services.AddServiceBusConfiguration(configuration);
+
+            // IEventPublisher: publica TransactionCompleted / TransactionFailed al Service Bus
+            services.AddScoped<IEventPublisher, ServiceBusEventPublisher>();
 
             return services;
         }
@@ -48,8 +56,18 @@ namespace WalletService.Infrastructure
 
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IProcessedTransactionRepository, ProcessedTransactionRepository>();
 
-            return services;    
+            return services;
+        }
+
+        private static IServiceCollection AddExchangeRate(this IServiceCollection services, IConfiguration configuration)
+        {
+            var options = configuration.GetSection(ExchangeRateOptions.SectionName).Get<ExchangeRateOptions>()
+                          ?? new ExchangeRateOptions();
+            services.AddSingleton(options);
+            services.AddSingleton<IExchangeRateProvider, ConfigurationExchangeRateProvider>();
+            return services;
         }
     }
 }
