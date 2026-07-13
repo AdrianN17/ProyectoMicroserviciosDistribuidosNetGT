@@ -37,11 +37,12 @@ public static class MapperSchemaCommand
     // ── Transaction ───────────────────────────────────────────
     public static CreateTransactionCommand ToCommand(this TransactionSchemaRequest schema)
         => new(
-            FromWalletId: schema.FromWalletId,
-            ToWalletId:   schema.ToWalletId,
-            Amount:       (decimal)schema.Amount,
-            Currency:     schema.Currency,
-            SourceType:   schema.SourceType
+            TransactionId: schema.TransactionId == Guid.Empty ? Guid.NewGuid() : schema.TransactionId,
+            FromWalletId:  schema.FromWalletId,
+            ToWalletId:    schema.ToWalletId,
+            Amount:        (decimal)schema.Amount,
+            Currency:      schema.Currency,
+            SourceType:    schema.SourceType
         );
 
     public static DeleteTransactionCommand ToDeleteTransactionCommand(this Guid transactionId)

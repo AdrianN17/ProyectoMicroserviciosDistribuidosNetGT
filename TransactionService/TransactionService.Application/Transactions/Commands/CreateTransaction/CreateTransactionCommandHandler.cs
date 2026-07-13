@@ -32,8 +32,20 @@ public sealed class CreateTransactionCommandHandler
         CancellationToken        cancellationToken)
     {
         _logger.LogInformation(
-            "Creando transacción PENDING de {FromWalletId} → {ToWalletId}",
-            request.FromWalletId, request.ToWalletId);
+            "Creando transacción PENDING de {FromWalletId} → {ToWalletId} con TransactionId {TransactionId}",
+            request.FromWalletId, request.ToWalletId, request.TransactionId);
+
+        // ── Idempotencia: si ya existe la transacción, devolvemos el ID sin duplicar ──
+        var existing = await _transactionRepository.GetByIdAsync(
+            new TransactionId(request.TransactionId), cancellationToken);
+
+        if (existing is not null)
+        {
+            _logger.LogWarning(
+                "Transacción {TransactionId} ya existe (idempotencia). Devolviendo ID existente.",
+                request.TransactionId);
+            return existing.Id.Value;
+        }
 
         if (!EnumParsing.TryParseEnum<CurrencyType>(request.Currency, out var currency))
             return Error.Validation(
@@ -47,11 +59,12 @@ public sealed class CreateTransactionCommandHandler
 
         // Create() establece estado PENDING y agrega TransactionCreatedDomainEvent
         var transaction = Transaction.Create(
-            fromWalletId: request.FromWalletId,
-            toWalletId:   request.ToWalletId,
-            amount:       request.Amount,
-            currency:     currency,
-            sourceType:   sourceType
+            transactionId: request.TransactionId,
+            fromWalletId:  request.FromWalletId,
+            toWalletId:    request.ToWalletId,
+            amount:        request.Amount,
+            currency:      currency,
+            sourceType:    sourceType
         );
 
         await _transactionRepository.CreateAsync(transaction);

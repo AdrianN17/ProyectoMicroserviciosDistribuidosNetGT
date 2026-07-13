@@ -19,8 +19,10 @@ public class Transaction : AggregateRoot<TransactionId>
     /// <summary>
     /// Crea una transacción en estado PENDING y levanta el evento de dominio
     /// TransactionCreatedDomainEvent. No valida saldo ni límites.
+    /// El <paramref name="transactionId"/> es provisto por el cliente para idempotencia.
     /// </summary>
     public static Transaction Create(
+        Guid         transactionId,
         Guid         fromWalletId,
         Guid         toWalletId,
         decimal      amount,
@@ -34,7 +36,7 @@ public class Transaction : AggregateRoot<TransactionId>
 
         var transaction = new Transaction
         {
-            Id                = TransactionId.NewId(),
+            Id                = new TransactionId(transactionId),
             FromWalletId      = new WalletId(fromWalletId),
             ToWalletId        = new WalletId(toWalletId),
             Amount            = Amount.Create(amount, currency, exchangeRate: 1m),
