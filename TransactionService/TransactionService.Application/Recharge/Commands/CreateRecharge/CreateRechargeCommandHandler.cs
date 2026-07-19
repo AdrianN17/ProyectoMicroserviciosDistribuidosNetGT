@@ -36,6 +36,18 @@ public sealed class CreateRechargeCommandHandler : IRequestHandler<CreateRecharg
     {
         _logger.LogInformation("Creando recarga PENDING para WalletId {WalletId}", request.WalletId);
 
+        // ── Idempotencia: si ya existe la recarga, devolvemos el ID sin duplicar ──
+        var existing = await _rechargeRepository.GetByIdAsync(
+            new RechargeId(request.RechargeId), cancellationToken);
+
+        if (existing is not null)
+        {
+            _logger.LogWarning(
+                "Recarga {RechargeId} ya existe (idempotencia). Devolviendo ID existente.",
+                request.RechargeId);
+            return existing.Id.Value;
+        }
+
         if (!EnumParsing.TryParseEnum<CurrencyType>(request.Currency, out var currency))
             return Error.Validation(code: "CurrencyType.Invalid", description: $"CurrencyType '{request.Currency}' no es válido.");
 
@@ -49,6 +61,7 @@ public sealed class CreateRechargeCommandHandler : IRequestHandler<CreateRecharg
 
         // Create() inicia en PENDING y levanta RechargeCreatedDomainEvent
         var recharge = DomainRecharge.Create(
+            rechargeId:   request.RechargeId,
             walletId:     request.WalletId,
             amount:       request.Amount,
             currency:     currency,

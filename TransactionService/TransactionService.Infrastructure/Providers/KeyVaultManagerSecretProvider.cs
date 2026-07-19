@@ -19,7 +19,7 @@ namespace TransactionService.Infrastructure.Providers
                 ExcludeEnvironmentCredential = true,
                 ExcludeVisualStudioCredential = true,
                 ExcludeVisualStudioCodeCredential = true,
-                ExcludeAzureCliCredential = true,
+                ExcludeAzureCliCredential = false,
                 ExcludeAzurePowerShellCredential = true
             }));
             _cache = cache;

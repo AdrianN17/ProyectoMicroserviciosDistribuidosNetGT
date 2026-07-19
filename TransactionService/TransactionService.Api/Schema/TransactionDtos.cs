@@ -29,13 +29,6 @@ namespace TransactionService.Api.Schema
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class TransactionSchemaRequest
     {
-        /// <summary>
-        /// Clave de idempotencia opcional. Si el cliente la envía, se usa para evitar
-        /// crear transacciones duplicadas en reintentos. Si no se envía, se genera una nueva.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("TransactionId")]
-        public System.Guid TransactionId { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("FromWalletId")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.Guid FromWalletId { get; set; }

@@ -11,7 +11,7 @@
 La transferencia entre wallets se implementa mediante un **Saga Coreografiado** (Choreography-Based Saga). No existe un orquestador central: cada microservicio reacciona de forma autónoma a los eventos publicados en Azure Service Bus y decide el siguiente paso.
 
 La idempotencia se garantiza en dos niveles:
-- **TransactionService**: el cliente envía un `TransactionId` (UUID v4) junto a cada petición. Si ya existe, se devuelve el ID sin crear un duplicado.
+- **TransactionService**: el cliente envía el header `Idempotency-Key: <UUID v4>` en cada petición. Si ya existe una transacción con ese ID, se devuelve el ID sin crear un duplicado. Si el header se omite, se genera un UUID nuevo.
 - **WalletService**: la tabla `ProcessedTransactions` registra cada `TransactionId` procesado. Si el bus reenvía el mensaje (retry), el handler lo descarta antes de tocar los saldos.
 
 ---
@@ -26,8 +26,8 @@ sequenceDiagram
     participant ASB as Azure Service Bus
     participant WS as WalletService
 
-    Cliente->>TS: POST /transactions {TransactionId, from, to, amount, currency}
-    TS->>TS: Idempotencia: ¿TransactionId ya existe?
+    Cliente->>TS: POST /transactions {from, to, amount, currency}\nHeader: Idempotency-Key: <UUID>
+    TS->>TS: Idempotencia: ¿TransactionId (del header) ya existe?
     alt Ya existe
         TS-->>Cliente: 200 OK — ID existente (sin duplicar)
     else Es nuevo
@@ -90,7 +90,7 @@ sequenceDiagram
 La recarga de saldo también se implementa con el mismo patrón **Choreography-Based Saga**. El cliente crea una recarga en `TransactionService`, y `WalletService` es el responsable de acreditar el saldo y confirmar o rechazar la operación.
 
 La idempotencia se garantiza en dos niveles:
-- **TransactionService**: los handlers `CompleteRecharge` y `FailRecharge` verifican el estado actual antes de modificarlo. Si ya está en el estado destino, ignoran el evento sin error.
+- **TransactionService**: el cliente envía el header `Idempotency-Key: <UUID v4>` en cada petición. Si ya existe una recarga con ese ID, se devuelve el ID sin crear un duplicado. Los handlers `CompleteRecharge` y `FailRecharge` verifican el estado actual antes de modificarlo.
 - **WalletService**: la tabla `ProcessedRecharges` registra cada `RechargeId` procesado. Si el bus reenvía el mensaje, el handler lo descarta antes de tocar el saldo.
 
 ---
@@ -105,7 +105,8 @@ sequenceDiagram
     participant ASB as Azure Service Bus
     participant WS as WalletService
 
-    Cliente->>TS: POST /recharges {walletId, amount, currency, methodType}
+    Cliente->>TS: POST /recharges {walletId, amount, currency, methodType}\nHeader: Idempotency-Key: <UUID>
+    TS->>TS: Idempotencia: ¿RechargeId (del header) ya existe?
     TS->>TS: Obtiene tipo de cambio (ExchangeRateService)
     TS->>TS: Recharge.Create() → estado PENDING
     TS->>TS: SaveChanges → dispara RechargeCreatedDomainEvent
@@ -215,7 +216,7 @@ Todos los tipos de mensaje llevan el atributo `[MessageUrn]` con un URN canónic
 | `TransactionCreated` (reintento) | WalletService consulta `ProcessedTransactions` → ya existe → descarta sin modificar saldos |
 | `TransactionCompleted` (reintento) | TransactionService verifica `Status == COMPLETED` → ignora sin error |
 | `TransactionFailed` (reintento) | TransactionService verifica `Status == FAILED` → ignora sin error |
-| `POST /transactions` con mismo `TransactionId` | TransactionService devuelve el ID sin crear una nueva transacción |
+| `POST /transactions` con mismo `Idempotency-Key` header | TransactionService devuelve el ID sin crear una nueva transacción |
 
 #### Recarga
 
@@ -224,6 +225,7 @@ Todos los tipos de mensaje llevan el atributo `[MessageUrn]` con un URN canónic
 | `RechargeCreated` (reintento) | WalletService consulta `ProcessedRecharges` → ya existe → descarta sin acreditar saldo |
 | `RechargeCompleted` (reintento) | TransactionService verifica `Status == COMPLETED` → ignora sin error |
 | `RechargeFailed` (reintento) | TransactionService verifica `Status == FAILED` → ignora sin error |
+| `POST /recharges` con mismo `Idempotency-Key` header | TransactionService devuelve el ID sin crear una nueva recarga |
 
 ---
 
@@ -252,3 +254,38 @@ stateDiagram-v2
     FAILED --> [*]
     CANCELLED --> [*]
 ```
+
+---
+
+## Autenticación y Autorización
+
+La autenticación usa **Azure AD (Entra ID)** con tokens JWT Bearer. Cada servicio valida el token contra el endpoint OIDC del tenant (`https://login.microsoftonline.com/{tenantId}/v2.0`). Los roles se leen del claim `roles` del token.
+
+### Roles
+
+| Rol | Descripción |
+|---|---|
+| `User-App` | Usuario final de la aplicación |
+| `Seller` | Vendedor/operador que gestiona recargas |
+| `Support` | Soporte técnico con permisos de administración |
+
+### Endpoints — TransactionService
+
+| Método | Endpoint | Rol requerido |
+|---|---|---|
+| `POST` | `/api/transactions` | `User-App` |
+| `GET` | `/api/transactions/wallet/{fromWalletId}` | `User-App` |
+| `DELETE` | `/api/transactions/{transactionId}` | `Support` |
+| `POST` | `/api/recharges` | `Seller` |
+| `GET` | `/api/recharges/wallet/{walletId}` | `Seller`, `User-App` |
+| `DELETE` | `/api/recharges/{rechargeId}` | `Support` |
+
+### Endpoints — WalletService
+
+| Método | Endpoint | Rol requerido |
+|---|---|---|
+| `POST` | `/api/wallets` | `Support` |
+| `GET` | `/api/wallets/{walletId}` | cualquier rol autenticado |
+| `PATCH` | `/api/wallets/{walletId}` | cualquier rol autenticado |
+| `DELETE` | `/api/wallets/{walletId}` | `Support` |
+

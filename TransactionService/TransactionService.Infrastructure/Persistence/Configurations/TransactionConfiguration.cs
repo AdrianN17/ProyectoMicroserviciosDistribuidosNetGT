@@ -7,7 +7,6 @@ namespace TransactionService.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
-            builder.ToContainer("Transactions");
             builder.Ignore(t => t.DomainEvents);
 
             builder.Property(t => t.Id)

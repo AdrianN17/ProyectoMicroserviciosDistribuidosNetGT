@@ -32,7 +32,7 @@ namespace WalletService.Infrastructure
 
             services.AddSingleton<InMemorySecretCache>();
             services.AddPersistence(configuration);
-            services.AddExchangeRate(configuration);
+            services.AddHttpClients(configuration);
             services.AddServiceBusConfiguration(configuration);
 
             // IEventPublisher: publica TransactionCompleted / TransactionFailed al Service Bus
@@ -62,12 +62,17 @@ namespace WalletService.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddExchangeRate(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
         {
-            var options = configuration.GetSection(ExchangeRateOptions.SectionName).Get<ExchangeRateOptions>()
-                          ?? new ExchangeRateOptions();
-            services.AddSingleton(options);
-            services.AddSingleton<IExchangeRateProvider, ConfigurationExchangeRateProvider>();
+            var options = configuration.GetSection(HttpClientOptions.SectionName).Get<HttpClientOptions>() ?? new HttpClientOptions();
+
+            services.AddHttpClient<IExchangeRateProvider, HttpExchangeRateProvider>(client =>
+            {
+                if (!string.IsNullOrEmpty(options.ExchangeServiceBaseUrl))
+                    client.BaseAddress = new Uri(options.ExchangeServiceBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+
             return services;
         }
     }

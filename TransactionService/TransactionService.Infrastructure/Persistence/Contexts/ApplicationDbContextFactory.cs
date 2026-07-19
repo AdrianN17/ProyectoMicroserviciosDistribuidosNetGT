@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Options;
+using TransactionService.Infrastructure.Configuration;
 
 namespace TransactionService.Infrastructure.Persistence.Contexts
 {
@@ -19,7 +21,9 @@ namespace TransactionService.Infrastructure.Persistence.Contexts
                 .UseCosmos(connectionString, databaseName)
                 .EnableSensitiveDataLogging();
 
-            return new ApplicationDbContext(optionsBuilder.Options, new NoOpPublisher());
+            var cosmosOptions = Options.Create(new CosmosOptions());
+
+            return new ApplicationDbContext(optionsBuilder.Options, new NoOpPublisher(), cosmosOptions);
         }
     }
 

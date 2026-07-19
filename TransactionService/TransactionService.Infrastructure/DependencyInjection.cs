@@ -34,6 +34,7 @@ namespace TransactionService.Infrastructure
                     "Invalid SecretProviderType configuration. Valid values are 'KeyVault'.");
 
             services.AddSingleton<InMemorySecretCache>();
+            services.Configure<CosmosOptions>(configuration.GetSection(CosmosOptions.SectionName));
             services.AddPersistence(configuration);
             services.AddHttpClients(configuration);
             services.AddServiceBusConfiguration(configuration);

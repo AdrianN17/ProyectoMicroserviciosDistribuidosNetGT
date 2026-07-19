@@ -1,7 +1,9 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TransactionService.Api
@@ -100,6 +102,25 @@ namespace TransactionService.Api
 
             // Excepciones inesperadas => ProblemDetails consistente
             services.AddExceptionHandler<GlobalExceptionHandler>();
+
+            // ── JWT Authentication (Entra ID) ──────────────────────────────────────
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer();
+
+            services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+                    .Configure<IConfiguration>((options, config) =>
+                    {
+                        var tenantId = config["AzureAd:TenantId"]
+                            ?? throw new InvalidOperationException("AzureAd:TenantId no está configurado.");
+                        var clientId = config["AzureAd:ClientId"]
+                            ?? throw new InvalidOperationException("AzureAd:ClientId no está configurado.");
+
+                        options.Authority = $"https://login.microsoftonline.com/{tenantId}/v2.0";
+                        options.Audience  = clientId;
+                        options.TokenValidationParameters.RoleClaimType = "roles";
+                    });
+
+            services.AddAuthorization();
 
             return services;
 

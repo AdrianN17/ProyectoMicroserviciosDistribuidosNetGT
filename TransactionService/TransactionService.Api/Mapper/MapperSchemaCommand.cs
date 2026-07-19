@@ -10,8 +10,9 @@ namespace TransactionService.Api.Mapper;
 public static class MapperSchemaCommand
 {
     // ── Recharge ──────────────────────────────────────────────
-    public static CreateRechargeCommand ToCommand(this RechargeSchemaRequest schema)
+    public static CreateRechargeCommand ToCommand(this RechargeSchemaRequest schema, Guid idempotencyKey)
         => new(
+            RechargeId: idempotencyKey,
             WalletId:   schema.WalletId,
             Amount:     (decimal)schema.Amount,
             Currency:   schema.Currency,
@@ -35,9 +36,9 @@ public static class MapperSchemaCommand
         => new() { RechargeId = rechargeId };
 
     // ── Transaction ───────────────────────────────────────────
-    public static CreateTransactionCommand ToCommand(this TransactionSchemaRequest schema)
+    public static CreateTransactionCommand ToCommand(this TransactionSchemaRequest schema, Guid idempotencyKey)
         => new(
-            TransactionId: schema.TransactionId == Guid.Empty ? Guid.NewGuid() : schema.TransactionId,
+            TransactionId: idempotencyKey,
             FromWalletId:  schema.FromWalletId,
             ToWalletId:    schema.ToWalletId,
             Amount:        (decimal)schema.Amount,

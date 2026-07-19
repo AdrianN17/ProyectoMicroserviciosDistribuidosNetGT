@@ -88,7 +88,7 @@ public sealed class ProcessRechargeCreatedCommandHandler : IRequestHandler<Proce
         }
 
         // ── Validar estado de la wallet ───────────────────────────────────────────
-        if (wallet.WalletStatus != WalletStatus.ACTIVE)
+        if (wallet.WalletStatus != WalletStatus.OPERATIVE)
         {
             _logger.LogWarning(
                 "Wallet bloqueada. RechargeId: {RechargeId}, WalletId: {WalletId}",
@@ -126,11 +126,13 @@ public sealed class ProcessRechargeCreatedCommandHandler : IRequestHandler<Proce
         }
 
         // ── Construir operación de crédito ────────────────────────────────────────
-        var creditOperation = new Operation(
-            Type:     TypeOperation.Addition,
-            WalletId: wallet.Id,
-            Amount:   creditAmount,
-            Currency: walletCurrency);
+        var creditOperation = new Operation
+        {
+            Type     = TypeOperation.Addition,
+            WalletId = wallet.Id,
+            Amount   = creditAmount,
+            Currency = walletCurrency
+        };
 
         // ── Persistir de forma atómica ────────────────────────────────────────────
         try

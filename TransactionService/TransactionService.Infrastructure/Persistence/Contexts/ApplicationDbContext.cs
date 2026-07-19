@@ -1,19 +1,24 @@
 ﻿﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TransactionService.Application.Commmon.Interfaces;
 using TransactionService.Domain.Common;
+using TransactionService.Infrastructure.Configuration;
 
 namespace TransactionService.Infrastructure.Persistence.Contexts
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         private readonly IPublisher _publisher;
+        private readonly CosmosOptions _cosmosOptions;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
-            IPublisher publisher) : base(options)
+            IPublisher publisher,
+            IOptions<CosmosOptions> cosmosOptions) : base(options)
         {
-            _publisher = publisher;
+            _publisher     = publisher;
+            _cosmosOptions = cosmosOptions.Value;
         }
 
         public DbSet<Transaction> Transactions { get; set; }
@@ -27,6 +32,10 @@ namespace TransactionService.Infrastructure.Persistence.Contexts
 
             var assembly = typeof(ApplicationDbContext).Assembly;
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);
+
+            // Sobreescribir los nombres de contenedor con los valores de configuración
+            modelBuilder.Entity<Recharge>().ToContainer(_cosmosOptions.RechargesContainerName);
+            modelBuilder.Entity<Transaction>().ToContainer(_cosmosOptions.TransactionsContainerName);
 
             base.OnModelCreating(modelBuilder);
         }

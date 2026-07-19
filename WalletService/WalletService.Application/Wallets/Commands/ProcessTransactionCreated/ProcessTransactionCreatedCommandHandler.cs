@@ -129,7 +129,7 @@ public sealed class ProcessTransactionCreatedCommandHandler : IRequestHandler<Pr
             return Unit.Value;
         }
 
-        var usdToPenRate = _exchangeRateProvider.GetUsdToPenRate();
+        var usdToPenRate = await _exchangeRateProvider.GetUsdToPenRateAsync(cancellationToken);
         var transferResult = _transferDomainService.Execute(
             fromWallet,
             toWallet,

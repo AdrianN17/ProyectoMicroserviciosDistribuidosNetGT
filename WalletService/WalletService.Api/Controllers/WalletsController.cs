@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WalletService.Api.Mapper;
 using WalletService.Api.Schema;
@@ -8,10 +9,12 @@ namespace WalletService.Api.Controllers;
 
 [Route("api/wallets")]
 [ApiController]
+[Authorize]
 public class WalletsController(IMediator mediator) : ControllerBase
 {
     // POST /wallets
     [HttpPost(Name = "Wallet_Create")]
+    [Authorize(Roles = "Support")]
     [ProducesResponseType(typeof(WalletSchemaIdResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Create(
         [FromBody] WalletSchemaRequest request,
@@ -58,6 +61,7 @@ public class WalletsController(IMediator mediator) : ControllerBase
 
     // DELETE /wallets/{walletId}
     [HttpDelete("{walletId:guid}", Name = "Wallet_Delete")]
+    [Authorize(Roles = "Support")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete(
         [FromRoute] Guid walletId,

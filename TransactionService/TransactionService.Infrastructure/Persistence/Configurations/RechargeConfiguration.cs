@@ -7,8 +7,6 @@ namespace TransactionService.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Recharge> builder)
         {
-            builder.ToContainer("Recharges");
-
             // Ignorar la colección de domain events — no debe persistirse
             builder.Ignore(r => r.DomainEvents);
 

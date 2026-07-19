@@ -16,7 +16,7 @@ public class Recharge : AggregateRoot<RechargeId>
     {
     }
 
-    public static Recharge Create(Guid walletId, decimal amount, CurrencyType currency,
+    public static Recharge Create(Guid rechargeId, Guid walletId, decimal amount, CurrencyType currency,
         MethodType methodType, decimal exchangeRate)
     {
         var errors = ValidateFieldsRequired(walletId, amount, currency, methodType, exchangeRate);
@@ -30,7 +30,7 @@ public class Recharge : AggregateRoot<RechargeId>
         {
             recharge = new Recharge
             {
-                Id = RechargeId.NewId(),
+                Id = new RechargeId(rechargeId),
                 WalletId = new WalletId(walletId),
                 Amount = Amount.Create(amount, currency, exchangeRate),
                 MethodType = methodType,
