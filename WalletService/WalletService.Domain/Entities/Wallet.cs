@@ -33,13 +33,13 @@ public class Wallet : AggregateRoot<WalletId>
 
         try
         {
-            var walletId = new WalletId(walletId);
+            var wid = new WalletId(walletId);
 
-            var walletLimit = WalletLimit.Create(walletId, currency, dailyLimit);
+            var walletLimit = WalletLimit.Create(wid, currency, dailyLimit);
 
             wallet = new Wallet
             {
-                Id = walletId,
+                Id = wid,
                 Name = name.Trim(),
                 LastName = lastName.Trim(),
                 Email = Email.Create(email),
@@ -47,7 +47,7 @@ public class Wallet : AggregateRoot<WalletId>
                 WalletLimit = walletLimit,
                 Document = DocumentId.Create(documentType, documentNumber),
                 WalletStatus = WalletStatus.OPERATIVE,
-                WalletBalance = WalletBalance.Create(walletId, currency, balanceAmount ?? 0m)
+                WalletBalance = WalletBalance.Create(wid, currency, balanceAmount ?? 0m)
             };
         }
         catch (InvalidValueObjectException iv)

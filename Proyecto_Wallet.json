@@ -80,9 +80,21 @@
               "name": "Create Wallet",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "3b9ef9b5-ae78-4b1d-b4e5-d8c624e94f18",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -100,7 +112,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"Name\": \"Adrian\",\n  \"LastName\": \"Melgarejo\",\n  \"DocumentNumber\": \"77091558\",\n  \"DocumentType\": \"DNI\",\n  \"Email\": \"amelgarejo@gmail.com\",\n  \"Phone\": \"999888666\",\n  \"Currency\": \"PEN\",\n  \"DailyLimit\": 500\n}",
+                  "raw": "{\n  \"Name\": \"Adrian\",\n  \"LastName\": \"Melgarejo\",\n  \"DocumentNumber\": \"77091553\",\n  \"DocumentType\": \"DNI\",\n  \"Email\": \"amelgarejo@gmail.com\",\n  \"Phone\": \"999888666\",\n  \"Currency\": \"PEN\",\n  \"DailyLimit\": 500\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -115,7 +127,12 @@
                 "method": "PATCH",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -149,11 +166,16 @@
                 "method": "GET",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
-                  "raw": "http://localhost:5072/api/Wallets/9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec",
+                  "raw": "http://localhost:5072/api/Wallets/3b9ef9b5-ae78-4b1d-b4e5-d8c624e94f18",
                   "protocol": "http",
                   "host": [
                     "localhost:5072"
@@ -161,7 +183,7 @@
                   "path": [
                     "api",
                     "Wallets",
-                    "9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec"
+                    "3b9ef9b5-ae78-4b1d-b4e5-d8c624e94f18"
                   ],
                   "query": [],
                   "variable": []
@@ -174,7 +196,12 @@
                 "method": "DELETE",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -241,7 +268,12 @@
                   }
                 ],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -317,7 +349,12 @@
                 "method": "DELETE",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -354,9 +391,21 @@
               "name": "Create Recharge",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "3b9ef9b5-ae78-4b1d-b4e5-d8c624e94f18",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -389,7 +438,12 @@
                 "method": "GET",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {
@@ -415,7 +469,12 @@
                 "method": "DELETE",
                 "header": [],
                 "auth": {
-                  "type": "noauth"
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
                 },
                 "description": "",
                 "url": {

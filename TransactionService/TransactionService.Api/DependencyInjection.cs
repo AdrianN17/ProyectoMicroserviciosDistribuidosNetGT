@@ -10,7 +10,7 @@ namespace TransactionService.Api
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddPresentation(this IServiceCollection services)
+        public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddControllers();
               //.AddJsonOptions(o =>
@@ -104,19 +104,17 @@ namespace TransactionService.Api
             services.AddExceptionHandler<GlobalExceptionHandler>();
 
             // ── JWT Authentication (Entra ID) ──────────────────────────────────────
+            var tenantId = configuration["AzureAd:TenantId"]
+                ?? throw new InvalidOperationException("AzureAd:TenantId no está configurado.");
+            var clientId = configuration["AzureAd:ClientId"]
+                ?? throw new InvalidOperationException("AzureAd:ClientId no está configurado.");
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer();
-
-            services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-                    .Configure<IConfiguration>((options, config) =>
+                    .AddJwtBearer(options =>
                     {
-                        var tenantId = config["AzureAd:TenantId"]
-                            ?? throw new InvalidOperationException("AzureAd:TenantId no está configurado.");
-                        var clientId = config["AzureAd:ClientId"]
-                            ?? throw new InvalidOperationException("AzureAd:ClientId no está configurado.");
-
-                        options.Authority = $"https://login.microsoftonline.com/{tenantId}/v2.0";
-                        options.Audience  = clientId;
+                        options.Authority           = $"https://login.microsoftonline.com/{tenantId}/v2.0";
+                        options.Audience            = clientId;
+                        options.MapInboundClaims    = false;
                         options.TokenValidationParameters.RoleClaimType = "roles";
                     });
 
