@@ -1,0 +1,1154 @@
+{
+  "info": {
+    "name": "Proyecto_Wallet",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Local",
+      "item": [
+        {
+          "name": "MockExchange",
+          "item": [
+            {
+              "name": "PEN",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/convert/currency/PEN",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "convert",
+                    "currency",
+                    "PEN"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "USD",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5000/convert/currency/USD",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5000"
+                  ],
+                  "path": [
+                    "convert",
+                    "currency",
+                    "USD"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wallet",
+          "item": [
+            {
+              "name": "Create Wallet",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5072/api/Wallets",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5072"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Name\": \"Adrian\",\n  \"LastName\": \"Melgarejo\",\n  \"DocumentNumber\": \"77091558\",\n  \"DocumentType\": \"DNI\",\n  \"Email\": \"amelgarejo@gmail.com\",\n  \"Phone\": \"999888666\",\n  \"Currency\": \"PEN\",\n  \"DailyLimit\": 500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update Wallet",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5072/api/Wallets/45058be1-d0b6-40ce-aa76-061bea302a93",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5072"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "45058be1-d0b6-40ce-aa76-061bea302a93"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian1\",\r\n  \"DailyLimit\": 1500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Wallet",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5072/api/Wallets/9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5072"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Delete Wallet",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5072/api/Wallets/45058be1-d0b6-40ce-aa76-061bea302a93",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5072"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "45058be1-d0b6-40ce-aa76-061bea302a93"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Get Wallet copy",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5072/api/Wallets/1c377592-ffd1-491a-ab03-ece4ac2c99cd",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5072"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "1c377592-ffd1-491a-ab03-ece4ac2c99cd"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transaction",
+          "item": [
+            {
+              "name": "Create Transaction",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "3b9ef9b5-ae78-4b1d-b4e5-d8c624e94f18",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Transactions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Transactions"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"FromWalletId\": \"9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec\",\n    \"ToWalletId\": \"1c377592-ffd1-491a-ab03-ece4ac2c99cd\",\n    \"Amount\": 30,\n    \"Currency\": \"PEN\",\n    \"SourceType\": \"APP\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Transactions",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{runtime_access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Transactions/wallet/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Transactions",
+                    "wallet",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"FromWalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"ToWalletId\": \"1ea3b343-7c6b-4e44-88ed-62dcc8b71681\",\r\n    \"Amount\": 50,\r\n    \"Currency\": \"PEN\",\r\n    \"SourceType\": \"APP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete Transactions",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Transactions/e174485b-c0db-4e0c-808b-8144fe206243",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Transactions",
+                    "e174485b-c0db-4e0c-808b-8144fe206243"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"FromWalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"ToWalletId\": \"1ea3b343-7c6b-4e44-88ed-62dcc8b71681\",\r\n    \"Amount\": 50,\r\n    \"Currency\": \"PEN\",\r\n    \"SourceType\": \"APP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recharge",
+          "item": [
+            {
+              "name": "Create Recharge",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Recharges",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Recharges"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"WalletId\": \"9afc4154-5cf6-4ffc-b946-a0c5eae4a4ec\",\n    \"Amount\": 200,\n    \"Currency\": \"PEN\",\n    \"MethodType\": \"TIENDA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Recharges",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Recharges/wallet/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Recharges",
+                    "wallet",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Delete Recharge",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "http://localhost:5071/api/Recharges/e174485b-c0db-4e0c-808b-8144fe206243",
+                  "protocol": "http",
+                  "host": [
+                    "localhost:5071"
+                  ],
+                  "path": [
+                    "api",
+                    "Recharges",
+                    "e174485b-c0db-4e0c-808b-8144fe206243"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "QA",
+      "item": [
+        {
+          "name": "Wallet",
+          "item": [
+            {
+              "name": "Create Wallet",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api/Wallets",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian\",\r\n  \"LastName\": \"Melgarejo\",\r\n  \"DocumentNumber\": \"77091555\",\r\n  \"DocumentType\": \"DNI\",\r\n  \"Email\": \"amelgarejo@gmail.com\",\r\n  \"Phone\": \"999888666\",\r\n  \"Currency\": \"PEN\",\r\n  \"DailyLimit\": 500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update Wallet",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api/Wallets/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian1\",\r\n  \"DailyLimit\": 1500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Wallet",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api/Wallets/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian1\",\r\n  \"DailyLimit\": 1500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Wallet Copy",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api/Wallets/1ea3b343-7c6b-4e44-88ed-62dcc8b71681",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "1ea3b343-7c6b-4e44-88ed-62dcc8b71681"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian1\",\r\n  \"DailyLimit\": 1500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete Wallet",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api/Wallets/7d809580-18cd-49eb-acf5-daaf8fa3a996",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api",
+                    "Wallets",
+                    "7d809580-18cd-49eb-acf5-daaf8fa3a996"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"Name\": \"Adrian1\",\r\n  \"DailyLimit\": 1500\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Transaction",
+          "item": [
+            {
+              "name": "Create Transaction",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Transactions",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Transactions"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"FromWalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"ToWalletId\": \"1ea3b343-7c6b-4e44-88ed-62dcc8b71681\",\r\n    \"Amount\": 20,\r\n    \"Currency\": \"PEN\",\r\n    \"SourceType\": \"APP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Transactions",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Transactions/wallet/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Transactions",
+                    "wallet",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"FromWalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"ToWalletId\": \"1ea3b343-7c6b-4e44-88ed-62dcc8b71681\",\r\n    \"Amount\": 50,\r\n    \"Currency\": \"PEN\",\r\n    \"SourceType\": \"APP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete Transactions",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Transactions/1ceb0428-8085-4041-b42e-8a8a91962b1a",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Transactions",
+                    "1ceb0428-8085-4041-b42e-8a8a91962b1a"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"FromWalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"ToWalletId\": \"1ea3b343-7c6b-4e44-88ed-62dcc8b71681\",\r\n    \"Amount\": 50,\r\n    \"Currency\": \"PEN\",\r\n    \"SourceType\": \"APP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recharge",
+          "item": [
+            {
+              "name": "Create Recharge",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Recharges",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Recharges"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"WalletId\": \"34a8f3f1-97bd-49a9-b504-69ea5e576d6d\",\r\n    \"Amount\": 200,\r\n    \"Currency\": \"PEN\",\r\n    \"MethodType\": \"TIENDA\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Recharges",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Recharges/wallet/34a8f3f1-97bd-49a9-b504-69ea5e576d6d",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Recharges",
+                    "wallet",
+                    "34a8f3f1-97bd-49a9-b504-69ea5e576d6d"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "Delete Recharge",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-transaction/Recharges/e174485b-c0db-4e0c-808b-8144fe206243",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-transaction",
+                    "Recharges",
+                    "e174485b-c0db-4e0c-808b-8144fe206243"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "MockExchange",
+          "item": [
+            {
+              "name": "USD",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-currency/convert/currency/USD",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-currency",
+                    "convert",
+                    "currency",
+                    "USD"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            },
+            {
+              "name": "PEN",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "",
+                "url": {
+                  "raw": "https://apimadriandemo01.azure-api.net/api-currency/convert/currency/PEN",
+                  "protocol": "https",
+                  "host": [
+                    "apimadriandemo01",
+                    "azure-api",
+                    "net"
+                  ],
+                  "path": [
+                    "api-currency",
+                    "convert",
+                    "currency",
+                    "PEN"
+                  ],
+                  "query": [],
+                  "variable": []
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bearer",
+      "request": {
+        "method": "post",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "https://login.microsoftonline.com/bbcf0814-0ddf-45e8-9081-46f4f44e31ac/oauth2/v2.0/token",
+          "protocol": "https",
+          "host": [
+            "login",
+            "microsoftonline",
+            "com"
+          ],
+          "path": [
+            "bbcf0814-0ddf-45e8-9081-46f4f44e31ac",
+            "oauth2",
+            "v2.0",
+            "token"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "client_id",
+              "value": "69ef10ea-bea1-4e75-8bed-2d536321de91",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "client_secret",
+              "value": "qRD8Q~DSXx8hi~Q89Tct8r36oA6FXMsKxu5Aiazo",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "scope",
+              "value": "api://69ef10ea-bea1-4e75-8bed-2d536321de91/.default",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "disabled": false,
+              "type": "default"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "bearer_user",
+      "request": {
+        "method": "post",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "https://login.microsoftonline.com/bbcf0814-0ddf-45e8-9081-46f4f44e31ac/oauth2/v2.0/token",
+          "protocol": "https",
+          "host": [
+            "login",
+            "microsoftonline",
+            "com"
+          ],
+          "path": [
+            "bbcf0814-0ddf-45e8-9081-46f4f44e31ac",
+            "oauth2",
+            "v2.0",
+            "token"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:device_code",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "client_id",
+              "value": "69ef10ea-bea1-4e75-8bed-2d536321de91",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "device_code",
+              "value": "{{runtime_device_code}}",
+              "disabled": false,
+              "type": "default"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "// Tests",
+              "const status = pm.response.code;",
+              "",
+              "if (status === 200) {",
+              "    const body = pm.response.json();",
+              "",
+              "    if (body.access_token) {",
+              "        pm.environment.set(\"runtime_access_token\", body.access_token);",
+              "        console.log(\"Access Token:\", body.access_token);",
+              "        console.log(\"Token guardado correctamente.\");",
+              "    } else {",
+              "        console.log(\"La respuesta es 200 pero no contiene access_token.\");",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "generator",
+      "request": {
+        "method": "post",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "https://login.microsoftonline.com/bbcf0814-0ddf-45e8-9081-46f4f44e31ac/oauth2/v2.0/devicecode",
+          "protocol": "https",
+          "host": [
+            "login",
+            "microsoftonline",
+            "com"
+          ],
+          "path": [
+            "bbcf0814-0ddf-45e8-9081-46f4f44e31ac",
+            "oauth2",
+            "v2.0",
+            "devicecode"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "client_id",
+              "value": "69ef10ea-bea1-4e75-8bed-2d536321de91",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "scope",
+              "value": "api://69ef10ea-bea1-4e75-8bed-2d536321de91/user_impersonation openid profile offline_access",
+              "disabled": false,
+              "type": "default"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "// Tests",
+              "const body = pm.response.json();",
+              "",
+              "pm.environment.set(\"runtime_device_code\", body.device_code);",
+              "",
+              "console.log(\"Device Code:\", body.device_code);"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "runtime_access_token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "runtime_device_code",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

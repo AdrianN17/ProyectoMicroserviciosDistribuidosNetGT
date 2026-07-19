@@ -21,7 +21,7 @@ public class Wallet : AggregateRoot<WalletId>
     {
     }
     
-    public static Wallet Create(string name, string lastName, DocumentType documentType, string documentNumber, 
+    public static Wallet Create(Guid walletId, string name, string lastName, DocumentType documentType, string documentNumber,
         string email, string phone, CurrencyType currency, decimal dailyLimit, decimal? balanceAmount=null)
     {
         var errors = ValidateFieldsRequired(name, lastName, documentType, documentNumber, email, phone, currency, dailyLimit);
@@ -33,7 +33,7 @@ public class Wallet : AggregateRoot<WalletId>
 
         try
         {
-            var walletId = WalletId.NewId();
+            var walletId = new WalletId(walletId);
 
             var walletLimit = WalletLimit.Create(walletId, currency, dailyLimit);
 

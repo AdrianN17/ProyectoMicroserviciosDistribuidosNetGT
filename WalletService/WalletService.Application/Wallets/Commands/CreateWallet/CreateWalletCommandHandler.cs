@@ -24,6 +24,14 @@ public sealed class CreateWalletCommandHandler : IRequestHandler<CreateWalletCom
     {
         _logger.LogInformation("Creating wallet with document number {DocumentNumber}", request.DocumentNumber);
 
+        // Idempotencia: si ya existe la wallet con ese ID, la devolvemos sin duplicar
+        var existing = await _walletRepository.GetByIdAsync(new WalletId(request.WalletId), cancellationToken);
+        if (existing is not null)
+        {
+            _logger.LogWarning("Wallet {WalletId} ya existe (idempotencia). Devolviendo ID existente.", request.WalletId);
+            return existing.Id.Value;
+        }
+
         if (!EnumParsing.TryParseEnum<DocumentType>(request.DocumentType, out var documentType))
             return Error.Validation(code: "DocumentType.Invalid", description: $"DocumentType '{request.DocumentType}' no es válido.");
         
@@ -31,6 +39,7 @@ public sealed class CreateWalletCommandHandler : IRequestHandler<CreateWalletCom
             return Error.Validation(code: "CurrencyType.Invalid", description: $"CurrencyType '{request.Currency}' no es válido.");
         
         var wallet = Wallet.Create(
+            request.WalletId,
             request.Name, 
             request.LastName, 
             documentType, 

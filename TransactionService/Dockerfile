@@ -32,6 +32,7 @@ WORKDIR /app
 
 COPY --from=publish /app/publish .
 
+ENV ASPNETCORE_URLS=http://+:8080
 # Puerto expuesto (ajústalo si usas otro)
 EXPOSE 8080
 

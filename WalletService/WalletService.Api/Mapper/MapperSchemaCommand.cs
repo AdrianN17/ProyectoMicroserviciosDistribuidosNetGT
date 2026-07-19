@@ -10,8 +10,9 @@ namespace WalletService.Api.Mapper;
 public static class MapperSchemaCommand
 {
     // ── WalletSchemaRequest → CreateWalletCommand ─────────────────
-    public static CreateWalletCommand ToCreateWalletCommand(this WalletSchemaRequest request) =>
+    public static CreateWalletCommand ToCreateWalletCommand(this WalletSchemaRequest request, Guid walletId) =>
         new(
+            WalletId:       walletId,
             Name:           request.Name,
             LastName:       request.LastName,
             DocumentType:   request.DocumentType,

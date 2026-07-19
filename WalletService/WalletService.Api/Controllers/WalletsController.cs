@@ -18,9 +18,10 @@ public class WalletsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(WalletSchemaIdResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Create(
         [FromBody] WalletSchemaRequest request,
+        [FromHeader(Name = "Idempotency-Key")] Guid? idempotencyKey,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(request.ToCreateWalletCommand(), cancellationToken);
+        var result = await mediator.Send(request.ToCreateWalletCommand(idempotencyKey ?? Guid.NewGuid()), cancellationToken);
 
         return result.Match(
             walletId => Ok(walletId.ToSchemaIdResponse()),
